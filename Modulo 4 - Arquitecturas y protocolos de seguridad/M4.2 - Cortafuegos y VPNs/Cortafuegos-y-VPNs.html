@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset='UTF-8'>
+<link rel='stylesheet' type='text/css' href='../../../../../apuntes.css'>
+
+<!-- MathJax -->
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$']],   // ✅ solo $...$
+    displayMath: [['$$', '$$']] // ✅ permite $$...$$ para fórmulas grandes
+  },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+
+<!-- Mermaid -->
+<script type="module">
+import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+mermaid.initialize({ startOnLoad: true });
+</script>
+
+</head>
+<body>
+<h1>Módulo 4: Arquitecturas y protocolos de seguridad. Tema 2: Cortafuegos y VPNs</h1>
+<h2>Cortafuegos</h2>
+<h3>¿Qué es un cortafuegos?</h3>
+<p>Un cortafuegos (o firewall) es un sistema de red que separa y controla el tráfico existente entre redes, permitiendo o denegando la comunicacin entre ellas. </p>
+<p>Se trata de un dispositivo (físico o lógico) que filtra el tráfico mediante unas reglas de filtrado que deciden que paquetes pueden pasar a la red interna desde la externa y viceversa. </p>
+<p>Hay dos tipos de cortafuegos: Cortafuegos de aplicación y cortafuegos.</p>
+<table>
+<thead>
+<tr>
+<th>Nivel TCP/IP</th>
+<th>Protocolos principales</th>
+<th>Dispositivo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Aplicación</td>
+<td>HTTP, DNS</td>
+<td>Cortafuegos de aplicación, IDS</td>
+</tr>
+<tr>
+<td>Transporte</td>
+<td>TCP, UDP, ICMP</td>
+<td>Cortafuegos</td>
+</tr>
+<tr>
+<td>Red</td>
+<td>IP</td>
+<td>Cortafuegos, Router</td>
+</tr>
+<tr>
+<td>Enlace</td>
+<td>ARP, Ethernet</td>
+<td>Switch, Hub</td>
+</tr>
+</tbody>
+</table>
+<h3>Reglas</h3>
+<p>Cada paquete que llega al dispositivo es comparado con las reglas, en orden hasta encontrar una coincidencia. Al encontrar una coincidencia se ejecuta la acción asociada a ella (denegar, aceptar, restringir, etc.). </p>
+<p>Si no hay ninguna coincidencia, se aplica la política por defecto: tráfico permitido o tráfico prohibido. La política por defecto de tráfico prohibido (DENY ALL) se considera la más segura</p>
+<p style="margin: 0;">Ejemplo:</p>
+<table style="margin-top: 0.5em;">
+<thead>
+<tr>
+<th>Regla</th>
+<th>Acción</th>
+<th>IP Origen</th>
+<th>Puerto Origen</th>
+<th>IP Destino</th>
+<th>Puerto Destino</th>
+<th>Protocolo</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>ALLOW</td>
+<td>10.0.0.0/24</td>
+<td>ANY</td>
+<td>ANY</td>
+<td>ANY</td>
+<td>ICMP</td>
+<td>Permite tráfico ICMP de salida</td>
+</tr>
+<tr>
+<td>2</td>
+<td>ALLOW</td>
+<td>10.0.0.0/24</td>
+<td>ANY</td>
+<td>ANY</td>
+<td>ANY</td>
+<td>TCP</td>
+<td>Permite conexiones TCP de salida</td>
+</tr>
+<tr>
+<td>3</td>
+<td>ALLOW</td>
+<td>ANY</td>
+<td>ANY</td>
+<td>10.0.0.1</td>
+<td>80</td>
+<td>TCP</td>
+<td>Permite la conexión con el servidor Web</td>
+</tr>
+<tr>
+<td>4</td>
+<td>DENY</td>
+<td>ANY</td>
+<td>ANY</td>
+<td>10.0.0.0</td>
+<td>ANY</td>
+<td>ANY</td>
+<td>Por defecto, rechaza cualquier otra conexión a la red interna</td>
+</tr>
+</tbody>
+</table>
+<h3 class="top-separator">Políticas por defecto</h3>
+<ul>
+<li>Denegación por defecto (DENY ALL): Más costosa de mantener, ya que es necesario indicar explícitamente todos los servicios que tienen que permanecer abiertos (los demás, por defecto, serán denegados).</li>
+<li>Aceptación por defecto (ACCEPT ALL): Es más sencilla de administrar, pero incrementa el riesgo de permitir ataques contra nuestra red, puesto que requiere indicar explícitamente qué paquetes es necesario descartar (los demás, por defecto, serán aceptados en su totalidad).</li>
+</ul>
+<h2>Cortafuegos de aplicación</h2>
+<p>Se diferencia de un cortafuegos tradicional en que entiende el nivel de aplicación. Esto significa que puede tomar decisiones basándose en los parámetros de la capa de aplicación, como HTTP, DNS, etc.</p>
+<p>Mientras que un cortafuegos a nivel de red o transporte filtra tráfico basándose en direcciones IP, puertos, tipos de protocolo y flags, un cortafuegos de aplicación va más allá.</p>
+<p>Algunos ejemplos de las decisiones y acciones que un cortafuegos de aplicación puede realizar incluyen:</p>
+<ul>
+<li>Filtrar ataques de inyección SQL en peticiones HTTP. La fuente muestra un ejemplo de cómo se vería una petición HTTP "envenenada" con un ataque de inyección SQL (SQLi) y menciona que la detección podría hacerse con una regla, aunque la sintaxis concreta dependerá del fabricante. Los servidores son puntos críticos y si se compromete uno con SQLi, puede usarse para "saltar" a otras máquinas cercanas (ataque de desplazamiento lateral).</li>
+<li>Bloquear el acceso a secciones específicas de un sitio web en función de la dirección IP o de los encabezados.</li>
+<li>Redirigir el tráfico a una página de mantenimiento.</li>
+<li>Evitar que los bots de los motores de búsqueda accedan a un sitio web.</li>
+</ul>
+<div class="layout">
+  <div class="left-col">
+
+    <h2>Redes DMZ</h2>
+    <p>La necesidad de una DMZ (DeMilitarized Zone) surge porque, en una topología tradicional con un único cortafuegos, un error o vulnerabilidad en ese cortafuegos puede dejar toda la red interna expuesta. Además, los servidores son un punto crítico; si uno se ve comprometido, puede utilizarse para saltar a otras máquinas cercanas, lo que se conoce como ataque de desplazamiento lateral.</p>
+    <p>El diseño de la red DMZ implica separar el exterior de la red de la DMZ. Aquí se sitúan los servidores públicos que deben ser accedidos desde Internet. Un cortafuegos se configura para rechazar todas las conexiones entrantes a la red interna desde la DMZ. De esta manera, si un servidor en la DMZ es comprometido, el ataque queda contenido en esa zona y no puede acceder fácilmente a la red interna.</p>
+  </div>
+  <div class="right-col">
+
+    <p><img alt="DMZ" src="image.png" /></p>
+  </div>
+</div>
+
+<h2>VPNs</h2>
+<p>Una red privada virtual (VPN) es una arquitectura que aúna dos tipos de tecnologías:</p>
+<ul>
+<li>Métodos criptográficos para asegurar la comunicacion.</li>
+<li class="top-separator">Protocolos de encapsulamiento (túneles) de tráfico que permiten que, en lugar de una conexión física dedicada para la red privada, se puede utilizar una infraestructura de red pública para definir sobre ella una red virtual.</li>
+</ul>
+<h3>Tipos</h3>
+<div class="layout">
+  <div class="left-col">
+    <p style="text-align: center;">Red-red (site-site)
+    <img alt="site-site" src="image-1.png" />
+    Conexión entre dos redes remotas, a través de un túnel que se establece entre los routers.</p>
+
+  </div>
+  <div class="right-col">
+
+    <p style="text-align: center;">Acceso remoto (cliente-red)
+    <img alt="cliente-red" src="image-2.png" />
+    Una vez establecido el túnel, el cliente obtiene una IP de
+    la red interna y pertenece de forma “lógica” a ella
+    El cliente dispondrá de dos interfaces “virtuales”: uno con
+    su IP pública, y otro con la IP privada de la VPN</p>
+  </div>
+</div>
+
+<h3>Protocolos</h3>
+<ul>
+<li>Point-to-Point Tunneling Protocol (PPTP): Funciona a nivel de enlace. Diseñado para conexiones sencillas, únicas entre cliente y servidor (no permiten conectar dos redes).</li>
+<li>Layer 2 Tunneling Protocol (L2TP): Este protocolo es una combinación del anterior, PPTP, y el antiguo Layer 2 Forwarding Protocol (L2F).<ul>
+<li>IPSec</li>
+<li>Es el estándar más completo, pues permite todo tipo de conexiones, incluyendo túneles que conectan dos redes completas, en lugar de dos computadores.</li>
+<li>Inconveniente: puede llegar a ser difícil de configurar.</li>
+</ul>
+</li>
+</ul>
+<h3>WireGuard</h3>
+<p>Wireguard es una implementación ligera de un protocolo VPN que destaca por su sencilla configuracion, que se realiza mediante archivos simples y legibles. Está implementado como un módulo del kernel de Linux para un alto rendimiento e integración, aunque también existen implementaciones para otros sistemas operativos como Windows, macOS y Android.</p>
+<h4>Arquitectura</h4>
+<ul>
+<li>Cada dispositivo (peer) tiene una clave pública y una privada</li>
+<li>La comunicacion es peer-to-peer, aunque se puede simular un modelo cliente-servidor.</li>
+<li>Las conexiones se establecen automáticamente cuando hay tráfico ("silent until needed").</li>
+<li>Se basa en el protocolo UDP, lo que lo hace eficiente y más resistente a cortafuegos.</li>
+</ul>
+<h2 class="page-break">Deep Web - Dark Web</h2>
+<table>
+<thead>
+<tr>
+<th>Web abierta</th>
+<th>Deep Web</th>
+<th>Dark Web</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>- Contenido indexado por los motores de búsqueda.<br>- Accesible con navegadores tradicionales.<br>- Supone menos del 5% del contenido total de datos.</td>
+<td>- Contenido "privado" o no indexado.<br>- Es, simplemente, contenido no accesible por los motores, como bases de datos, intranets, etc.<br>- No se sabe con precisión, pero puede suponer alrededor del 90% de los datos en Internet.</td>
+<td>- Contenido no indexado y solo accesible con protocolos específicos, como Tor.<br>- Aunque hay contenido legal, lo cierto es que la mayoría es ilícito.</td>
+</tr>
+</tbody>
+</table>
+</body>
+</html>

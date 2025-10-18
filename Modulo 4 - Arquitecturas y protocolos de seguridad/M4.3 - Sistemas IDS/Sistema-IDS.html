@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset='UTF-8'>
+<link rel='stylesheet' type='text/css' href='../../../../../apuntes.css'>
+
+<!-- MathJax -->
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$']],   // ✅ solo $...$
+    displayMath: [['$$', '$$']] // ✅ permite $$...$$ para fórmulas grandes
+  },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+
+<!-- Mermaid -->
+<script type="module">
+import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+mermaid.initialize({ startOnLoad: true });
+</script>
+
+</head>
+<body>
+<h1>Módulo 4: Arquitecturas y protocolos de seguridad. Tema 3: Sistemas IDS y señuelos</h1>
+<p>Una intrusión se define como una secuencia de acciones realizadas por un atacante que resulta en el compromiso de un sistema.</p>
+<p>La detección de intrusión es el proceso de identificación y respuesta a estos intentos de ataques. Este proceso involucra tecnología, personas y herramientas.</p>
+<p>La necesidad de los IDS radica en que, aunque existen otros mecanismos de seguridad como los cortafuegos y los antivirus, estos tienen limitaciones. Principalmente, otros mecanismos están pensados sobre todo para proteger del exterior. </p>
+<p>Sin embargo, casi el 50% de los ataques con éxito son llevados a cabo por usuarios internos del sistema. Esta es una razón crucial por la que los IDS son necesarios: pueden monitorear y detectar amenazas que se originan dentro de la red, algo para lo que los cortafuegos tradicionales no están diseñados. De hecho, se menciona que los IDS de host (HIDS) son más adecuados para combatir amenazas internas.</p>
+<p>Adema de las amenazas internas, aunque un ataque no tenga éxito, es probable que alerte de su intento. Esta información puede ser muy útil para entender los tipos de ataques que se están dirigiendo a la red, aunque no logren su objetivo en ese momento.</p>
+<p>En resumen, un sistema de detección de intrusión son los ojos de nuestra arquitectura de seguridad, que nos permite saber qué está pasando, dentro y fuera de nuestras redes.</p>
+<p>Cuando se detecta un intento de ataque se genera una alerta, que debería ser revisada de inmediato por un operador humano.</p>
+<ul>
+<li><strong>Falso Positivo</strong>: Se produce cuando un IDS genera una alerta falsa sobre un ataque que no se ha producido. La elevada tasa de falsos positivos es uno de los grandes inconvenientes de los IDS.</li>
+<li><strong>Falso Negativo</strong>: Se produce cuando un IDS no detecta un ataque y no genera la alerta correspondiente. Es muy peligroso, porque un único falso negativo puede provocar que una intrusión no sea detectada.</li>
+</ul>
+<h2>Cortafuegos vs. Antivirus vs. IDS</h2>
+<table>
+<thead>
+<tr>
+<th>Característica</th>
+<th>Cortafuegos</th>
+<th>Antivirus</th>
+<th>IDS (Sistema de Detección de Intrusos)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Qué vigilan</strong></td>
+<td>Tráfico de red y transporte</td>
+<td>Archivos, procesos en ejecución, memoria RAM</td>
+<td>Comportamiento del sistema/red</td>
+</tr>
+<tr>
+<td><strong>Cómo vigilan</strong></td>
+<td>Filtrado por IP, puertos, protocolos</td>
+<td>Detección de firmas, análisis heurístico</td>
+<td>Análisis basado en firmas y anomalías</td>
+</tr>
+<tr>
+<td><strong>Nivel de operación</strong></td>
+<td>Red y transporte</td>
+<td>Sistema operativo y aplicaciones</td>
+<td>Red (NIDS) o sistema operativo (HIDS)</td>
+</tr>
+</tbody>
+</table>
+
+<div class="top-separator">
+<table>
+  <thead>
+  <tr>
+  <th>Característica</th>
+  <th>Cortafuegos</th>
+  <th>Antivirus</th>
+  <th>IDS (Sistema de Detección de Intrusos)</th>
+  </tr>
+  </thead>
+  <tbody>
+<tr>
+<td><strong>Reacción típica</strong></td>
+<td>Bloquear paquetes/conexiones</td>
+<td>Poner en cuarentena, eliminar archivos, notificar</td>
+<td>Generar alertas, no intervienen directamente</td>
+</tr>
+<tr>
+<td><strong>Naturaleza de la acción</strong></td>
+<td>Preventiva</td>
+<td>Reactiva</td>
+<td>Pasiva (monitorización y alerta)</td>
+</tr>
+<tr>
+<td><strong>Protección principal</strong></td>
+<td>Contra amenazas externas</td>
+<td>Contra malware</td>
+<td>Contra amenazas internas y externas</td>
+</tr>
+<tr>
+<td><strong>Ventajas</strong></td>
+<td>Control del tráfico en tiempo real</td>
+<td>Eliminación directa del malware</td>
+<td>Visibilidad completa del comportamiento del sistema</td>
+</tr>
+<tr>
+<td><strong>Limitaciones</strong></td>
+<td>No detecta malware ni amenazas internas sofisticadas</td>
+<td>Puede no detectar amenazas nuevas (zero-day)</td>
+<td>Puede generar falsos positivos o negativos</td>
+</tr>
+<tr>
+<td><strong>Rol en defensa en profundidad</strong></td>
+<td>Primera línea de defensa</td>
+<td>Protección del endpoint</td>
+<td>Detección de intrusiones en segundo plano</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2>Tipos de IDS</h2>
+<p>Los IDS se clasifican utilizando dos criterios: </p>
+<div class="mermaid">graph TD
+    A((IDS)) --> B((Localización))
+    A --> C((Modo funcionamiento))
+    B --> D["IDS de host (HIDS)"]
+    B --> E["IDS de red (NIDS)"]
+    C --> F[Basados en reglas]
+    C --> G[Basados en anomalías]
+    C --> H[Mixtos]</div>
+
+<h3>IDS de Host (HIDS)</h3>
+<p>Los IDS de host son aquellos que monitorizan, detectan y responden a la actividad del usuario, del sistema y a ataques dirigidos a una máquina específica. La forma en que logran esto es examinando los parámetros del sistema operativo y el comportamiento del usuario a través de un agente:</p>
+<ul>
+<li>Uso de CPU y memoria.</li>
+<li class="top-separator">Monitorización de logs.</li>
+<li>Intentos fallidos de login.</li>
+<li>Monitorización del sistema de ficheros.</li>
+</ul>
+<p>Son los más adecuados para combatir amenazas internas. Esto es crucial porque, como se ha visto anteriormente, la fuente de ataques más numerosa son los desempleados “deshonestos” o puertas traseras.</p>
+<p>Aparte son muchos más baratos que los IDS de red (NIDS), con un coste estimado de 50 €/PC para HIDS frente a 8.000 € para NIDS.</p>
+<p>Hay ciertos ataques que no son fácilmente detectados por los NIDS, lo que subraya la importancia de los HIDS como un complemento necesario.</p>
+<p>Algunas soluciones open-source para UNIX son:</p>
+<ul>
+<li>TCPWrappers.</li>
+<li>Syslog.</li>
+<li>Swatch.</li>
+<li>Tripwire.</li>
+<li>OSSEC</li>
+</ul>
+<h3>IDS de Red (NIDS)</h3>
+<p>Los IDS de Red tienen como función capturar y analizar todo el tráfico de un segmento de red, en busca de actividad maliciosa. Normalmente, para lograr esto, seutilizan dispositivos en modo promiscuo, lo que les permite ver todos los paquetes que pasan por el segmento de red, no solo aquellos dirigidos a la propia sonda.</p>
+<p>La arquitectura de NIDS se compone de tres elementos principales:</p>
+<ul>
+<li>Sondas: Son elementos recolectores del sistema. Capturan el tráfico y realizan un primer paso de procesado. Posteriormente, envían los eventos generados al sistema gestor.</li>
+<li>Sistema gestor: Es el encargado de almacenar y gestionar los eventos recibidos. Se compone de una base de datos y un sistema de correlación de eventos.</li>
+<li>Consola de administración: Su función es clasificar y mostrar los eventos recibidos al operador.</li>
+</ul>
+<p>Un aspecto crítico para el funcionamiento eficaz de un NIDS es la ubicación de las sondas. Esto es fundamental porque determina que trafico puede monitorizarse. Tradicionalmente, los NIDS han tenido problemas para trabajar en entornos conmutados. En principio, en estos entornos, sería necesaria una sonda por cada segmento de red para ver todo el tráfico relevante. Esto puede disparar los costes. </p>
+<p>Para abordar el desafío de los entornos conmutados, hay un par de soluciones existentes:</p>
+<ul>
+<li>Spanning ports: Algunos switches ofrecen un puerto de span (o de agregación) por el que se recibe una copia de todo el tráfico que pasa por el switch. Conectando la sonda a este puerto, esta puede ver todo el tráfico. Sin embargo, esta solución tiene algunos problemas: si el tráfico es muy alto, el switch puede tener problemas de rendimiento y descartar paquetes, y algunos switches solo permiten un puerto de span por VLAN.</li>
+<li>Uso de TAPs: Un TAP (Terminal Access Point) es un dispositivo hardware que se coloca en línea en un cable de datos y envía una copia del tráfico a uno o más puntos, como una sonda NIDS. Los TAPs no tienen problemas de rendimiento ni necesitan configuración. No obstante, se debe elegir su ubicación con cuidado, ya que pueden sobrecargar fácilmente las sondas si se colocan en puntos con demasiado tráfico.</li>
+</ul>
+<h3>IDS basados en firmas</h3>
+<p>En cuanto a los métodos de detección utilizados, los NIDS, al igual que otros tipos de IDS, buscan comportamientos anómalos. Las fuentes explican que los IDS basados en firmas buscan patrones previamente definidos. Para los NIDS, esto significa buscar estos patrones en el tráfico de red. Cuando se detecta una concordancia con una regla o “firma”, se dispara la regla y se genera una alerta. Esta alerta se envía a una consola central para que un operador humano la analice y actúe en consecuencia.</p>
+<ul>
+<li class="top-separator">Para los IDS de red (NIDS), el parámetro monitorizado es el tráfico de red. Una firma simple podría ser: IF misma_dir_IP_origen AND diferentes_puerto_destino AND num_conexiones &gt;= 10 THEN ALERT ("Escaneo de puertos"). Esto muestra cómo analizan patrones en el tráfico de red.</li>
+<li>Para los IDS de host (HIDS), los parámetros incluyen el sistema de ficheros, así como el uso de CPU y memoria, logs, intentos fallidos de login, entre otros. Una firma simple podría ser: IF número_intentos_login_último_minuto &gt;= 10 AND mismo_usuario THEN ALERT ("Ataque de fuerza bruta contra cuenta de usuario"). Esto ilustra cómo monitorizan parámetros a nivel de host como los intentos de login.</li>
+</ul>
+<p>Las firmas reales no son tan sencillas. Esta es una firma de Snort para detectar un tipo de ataque contra dispositivos Cisco:</p>
+<div class="codehilite"><pre><span></span><code><span class="nx">alert</span><span class="w"> </span><span class="nx">tcp</span><span class="w"> </span><span class="nx">any</span><span class="w"> </span><span class="nx">any</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="err">$</span><span class="nx">HOME_NET</span><span class="w"> </span><span class="mi">23</span><span class="w"> </span><span class="p">(</span><span class="nx">msg</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;BLEEDING-EDGE</span>
+<span class="s">EXPLOIT Cisco Telnet Buffer Overflow&quot;</span><span class="p">;</span><span class="w"> </span><span class="nx">flow</span><span class="p">:</span>
+<span class="nx">to_server</span><span class="p">,</span><span class="nx">established</span><span class="p">;</span><span class="w"> </span><span class="nx">content</span><span class="p">:</span><span class="s">&quot;|3f 3f 3f 3f 3f 3f 3f 3f 3f 3f 3f 3f 3f</span>
+<span class="s">3f 3f 3f 3f 61 7e 20 25 25 25 25 25 58 58|&quot;</span><span class="p">;</span><span class="w"> </span><span class="nx">threshold</span><span class="p">:</span><span class="w"> </span><span class="k">type</span><span class="w"> </span><span class="nx">limit</span><span class="p">,</span>
+<span class="nx">track</span><span class="w"> </span><span class="nx">by_src</span><span class="p">,</span><span class="w"> </span><span class="nx">count</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="nx">seconds</span><span class="w"> </span><span class="mi">120</span><span class="p">;</span>
+<span class="nx">reference</span><span class="p">:</span><span class="nx">url</span><span class="p">,</span><span class="nx">www</span><span class="p">.</span><span class="nx">cisco</span><span class="p">.</span><span class="nx">com</span><span class="o">/</span><span class="nx">warp</span><span class="o">/</span><span class="nx">public</span><span class="o">/</span><span class="mi">707</span><span class="o">/</span><span class="nx">cisco</span><span class="o">-</span><span class="nx">sn</span><span class="o">-</span><span class="mi">20040326</span><span class="o">-</span>
+<span class="nx">exploits</span><span class="p">.</span><span class="nx">shtml</span><span class="p">;</span><span class="w"> </span><span class="nx">classtype</span><span class="p">:</span><span class="w"> </span><span class="nx">attempted</span><span class="o">-</span><span class="nx">dos</span><span class="p">;</span><span class="w"> </span><span class="nx">sid</span><span class="p">:</span><span class="w"> </span><span class="mi">2000005</span><span class="p">;</span><span class="w"> </span><span class="nx">rev</span><span class="p">:</span><span class="mi">4</span><span class="p">;</span><span class="w"> </span><span class="p">)</span>
+</code></pre></div>
+
+<h2>Snort</h2>
+<p>Snort es el mejor IDS libre y uno de los mejores de todo el mercado. Es un ejemplo prominente de un NIDS basado en firmas. Es muy extendido, fiable, con extensísima documentación y una comunidad muy activa que proporciona bases de reglas exactas y rápidamente actualizadas. Una ventaja clave de Snort es que su base de reglas se almacena en ficheros de texto plano, lo que permite un control total sobre ellas, a diferencia de muchos IDS comerciales que son "cajas negras" donde no se conoce ni se tiene control sobre la base de reglas, lo que dificulta reducir manualmente la tasa de falsos positivos</p>
+<h3>Uso de Snort</h3>
+<p><img alt="Uso-Snort" src="image.png" /></p>
+</body>
+</html>
